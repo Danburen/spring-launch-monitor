@@ -1,49 +1,73 @@
-package io.github.danburen.springlaunchmonitor.component;
+package io.github.danburen.springlaunchmonitor.spring;
 
 import io.github.danburen.springlaunchmonitor.data.BeanInitRecord;
 import io.github.danburen.springlaunchmonitor.data.ConfigSourceRecord;
+import io.github.danburen.springlaunchmonitor.data.LaunchRecordsCtx;
 import io.github.danburen.springlaunchmonitor.data.TimelineEvent;
+import io.github.danburen.springlaunchmonitor.util.EventRecorder;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Component
 public class EventLogger implements ApplicationListener<ApplicationReadyEvent> , Ordered {
     private Locale locale;
-    private Environment environment;
+    private final Environment environment;
+    private final MonitorMessageSource messageSource;
+    private boolean reportOnReadyEnabled = true;
+    private boolean flameOnReadyEnabled = true;
+
+    public EventLogger(Environment environment, MonitorMessageSource messageSource) {
+        this.environment = environment;
+        this.messageSource = messageSource;
+    }
 
     @PostConstruct
     public void init(){
-        this.locale = Locale.of(
-                environment.getProperty("launch.monitor.locale",
-                        Locale.getDefault().toString())
-        );
+        String localeCode = environment.getProperty("launch.monitor.locale", "auto");
+        if (localeCode.isBlank() || "auto".equalsIgnoreCase(localeCode)) {
+            this.locale = Locale.getDefault();
+        } else {
+            this.locale = Locale.forLanguageTag(localeCode.replace('_', '-'));
+        }
+
+        this.reportOnReadyEnabled = getBooleanProperty(true,
+                "launch.monitor.report",
+                "launch.monitor.report.enabled");
+        this.flameOnReadyEnabled = getBooleanProperty(true,
+                "launch.monitor.flame",
+                "launch.monitor.flame.enabled");
     }
 
 
 
     private String getMessage(String code, String defaultMessage, Object... args) {
-        return "";
+        return messageSource.getMessage(code, defaultMessage, locale, args);
     }
 
-    private String getMessage(String code, String defaultMessage, Locale locale) {
-        return getMessage(code, defaultMessage, locale, null);
+    private boolean getBooleanProperty(boolean defaultValue, String... keys) {
+        for (String key : keys) {
+            Boolean value = environment.getProperty(key, Boolean.class);
+            if (value != null) {
+                return value;
+            }
+        }
+        return defaultValue;
     }
 
-    public static String generateFlameGraphData() {
+    public String generateFlameGraphData() {
+        LaunchRecordsCtx records = EventRecorder.getCtx();
         StringBuilder sb = new StringBuilder();
 
-        events.forEach(e -> sb.append(String.format("springboot;%s %d%n",
+        records.getEvents().forEach(e -> sb.append(String.format("springboot;%s %d%n",
                 e.getPhase().replace(";", "_"), e.getDurationMs())));
 
-        Map<String, Long> packageTime = beanRecords.stream()
+        Map<String, Long> packageTime = records.getBeanRecords().stream()
                 .collect(Collectors.groupingBy(
                         r -> {
                             String className = r.getClassName();
@@ -60,24 +84,26 @@ public class EventLogger implements ApplicationListener<ApplicationReadyEvent> ,
         return sb.toString();
     }
 
-    public String generateTextReport(List<TimelineEvent> events,  List<BeanInitRecord> beanRecords, List<ConfigSourceRecord> configRecords) {
+    public String generateTextReport() {
+        LaunchRecordsCtx records = EventRecorder.getCtx();
         StringBuilder sb = new StringBuilder();
-        sb.append("🚀 Spring Boot启动分析报告\n");
-        sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        sb.append(getMessage("report.title", "\uD83D\uDE80 Spring Boot Application Startup Report"));
+        sb.append(getMessage("report.divider", "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"));
 
-        long totalTime = events.isEmpty() ? 0
-                : events.get(events.size() - 1).getDurationMs();
-        sb.append(String.format("总耗时: %,dms%n%n", totalTime));
+        long totalTime = records.getEvents().isEmpty() ? 0
+                : records.getEvents().get(records.getEvents().size() - 1).getDurationMs();
+        sb.append(getMessage("report.total.time", "Total startup time: {0} ms", totalTime)).append("\n\n");
 
-        sb.append("📊 启动阶段明细:\n");
-        events.forEach(e -> {
+        sb.append(getMessage("report.section.phase.details", "📊 Startup phase details:")).append("\n");
+         records.getEvents().forEach(e -> {
             String bar = "█".repeat(Math.min(50, (int) e.getDurationMs() / 100));
+            String phaseLabel = getMessage(e.getDesckey(), e.getPhase(), e.getArgs());
             sb.append(String.format("  %-25s %5dms %s%n",
-                    e.getPhase(), e.getDurationMs(), bar));
+                    phaseLabel, e.getDurationMs(), bar));
         });
 
-        sb.append("\n🔥 最慢Top 10 Bean:\n");
-        List<BeanInitRecord> topBeans = beanRecords.stream()
+        sb.append("\n").append(getMessage("report.section.slowest.beans", "🔥 Slowest Top 10 Beans:")).append("\n");
+        List<BeanInitRecord> topBeans = records.getBeanRecords().stream()
                 .sorted(Comparator.comparingLong(BeanInitRecord::getDurationMs).reversed())
                 .limit(10)
                 .toList();
@@ -89,13 +115,16 @@ public class EventLogger implements ApplicationListener<ApplicationReadyEvent> ,
                             i + 1, r.getBeanName(), r.getDurationMs()));
                 });
 
-        sb.append("\n💡 优化建议:\n");
-        analyzeBottlenecks(events, beanRecords, configRecords).forEach(s -> sb.append("  • ").append(s).append("\n"));
+        sb.append("\n").append(getMessage("report.section.optimization", "💡 Optimization suggestions:")).append("\n");
+        analyzeBottlenecks(records.getBeanRecords(),
+                records.getConfigRecords()
+        ).forEach(s -> sb.append("  • ").append(s).append("\n"));
 
         return sb.toString();
     }
 
-    public static List<String> analyzeBottlenecks(List<TimelineEvent> events,  List<BeanInitRecord> beanRecords, List<ConfigSourceRecord> configRecords) {
+    public List<String> analyzeBottlenecks(List<BeanInitRecord> beanRecords,
+                                           List<ConfigSourceRecord> configRecords) {
         List<String> suggestions = new ArrayList<>();
 
         long dbTime = beanRecords.stream()
@@ -104,49 +133,64 @@ public class EventLogger implements ApplicationListener<ApplicationReadyEvent> ,
                 .mapToLong(BeanInitRecord::getDurationMs)
                 .sum();
         if (dbTime > 1000) {
-            suggestions.add("数据库连接初始化耗时" + dbTime + "ms，建议检查网络或启用懒加载");
+            suggestions.add(getMessage(
+                    "report.suggestion.db.slow",
+                    "Database connection initialization took {0}ms; check network or enable lazy initialization",
+                    dbTime
+            ));
         }
 
         long totalBeanTime = beanRecords.stream()
                 .mapToLong(BeanInitRecord::getDurationMs)
                 .sum();
         if (totalBeanTime > 3000) {
-            suggestions.add("Bean初始化总耗时较长(" + totalBeanTime + "ms)，建议检查循环依赖");
+            suggestions.add(getMessage(
+                    "report.suggestion.bean.total.slow",
+                    "Total bean initialization time is high ({0}ms); check circular dependencies",
+                    totalBeanTime
+            ));
         }
 
         long configTime = configRecords.stream()
                 .mapToLong(ConfigSourceRecord::getDurationMs)
                 .sum();
         if (configTime > 500) {
-            suggestions.add("配置加载耗时" + configTime + "ms，建议减少配置文件大小");
+            suggestions.add(getMessage(
+                    "report.suggestion.config.slow",
+                    "Configuration loading took {0}ms; consider reducing config file size",
+                    configTime
+            ));
         }
 
-        return suggestions.isEmpty() ? Collections.singletonList("暂无性能瓶颈") : suggestions;
+        return suggestions.isEmpty()
+                ? Collections.singletonList(getMessage("report.suggestion.none", "No obvious performance bottlenecks detected"))
+                : suggestions;
     }
 
-    public static String generateReport(List<TimelineEvent> events,  List<BeanInitRecord> beanRecords, List<ConfigSourceRecord> configRecords) {
+    public String generateReport(List<TimelineEvent> events,  List<BeanInitRecord> beanRecords, List<ConfigSourceRecord> configRecords) {
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
-        sb.append("🚀 Spring Boot启动分析报告\n");
-        sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        sb.append(getMessage("report.title", "\uD83D\uDE80 Spring Boot Application Startup Report")).append("\n");
+        sb.append(getMessage("report.divider", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"));
 
-        // 总耗时
+        // total time
         long totalTime = events.isEmpty() ? 0
                 : events.get(events.size() - 1).getDurationMs();
-        sb.append(String.format("总耗时: %,dms%n%n", totalTime));
+        sb.append(getMessage("report.total.time", "Total startup time: {0} ms", totalTime)).append("\n\n");
 
-        // 阶段明细
-        sb.append("📊 启动阶段明细:\n");
+        // phase detail
+        sb.append(getMessage("report.section.phase.details", "📊 Startup phase details:")).append("\n");
         for (TimelineEvent e : events) {
             int barLength = Math.min(50, (int) e.getDurationMs() / 100);
             StringBuilder bar = new StringBuilder();
             bar.append("█".repeat(Math.max(0, barLength)));
+            String phaseLabel = getMessage(e.getDesckey(), e.getPhase(), e.getArgs());
             sb.append(String.format("  %-25s %5dms %s%n",
-                    e.getPhase(), e.getDurationMs(), bar.toString()));
+                    phaseLabel, e.getDurationMs(), bar.toString()));
         }
 
-        // 慢Bean Top 10
-        sb.append("\n🔥 最慢Top 10 Bean:\n");
+        // Slowest Top 10 beans
+        sb.append("\n").append(getMessage("report.section.slowest.beans", "🔥 Slowest Top 10 Beans:")).append("\n");
         List<BeanInitRecord> sortedBeans = new ArrayList<>(beanRecords);
         sortedBeans.sort((r1, r2) -> Long.compare(r2.getDurationMs(), r1.getDurationMs()));
 
@@ -157,9 +201,9 @@ public class EventLogger implements ApplicationListener<ApplicationReadyEvent> ,
                     i + 1, r.getBeanName(), r.getDurationMs()));
         }
 
-        // 优化建议
-        sb.append("\n💡 优化建议:\n");
-        List<String> suggestions = analyzeBottlenecks();
+        // suggestions
+        sb.append("\n").append(getMessage("report.section.optimization", "💡 Optimization suggestions:")).append("\n");
+        List<String> suggestions = analyzeBottlenecks(beanRecords, configRecords);
         for (String s : suggestions) {
             sb.append("  • ").append(s).append("\n");
         }
@@ -169,11 +213,17 @@ public class EventLogger implements ApplicationListener<ApplicationReadyEvent> ,
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE - 100;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-
+        if (!reportOnReadyEnabled) {
+            return;
+        }
+        System.out.println(generateTextReport());
+        if (flameOnReadyEnabled) {
+            System.out.println(generateFlameGraphData());
+        }
     }
 }

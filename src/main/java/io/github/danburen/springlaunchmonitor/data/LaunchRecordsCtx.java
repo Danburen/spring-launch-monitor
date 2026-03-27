@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class LaunchRecords {
+public class LaunchRecordsCtx {
     private List<TimelineEvent> events;
     private List<BeanInitRecord> beanRecords;
     private List<ConfigSourceRecord> configRecords;
