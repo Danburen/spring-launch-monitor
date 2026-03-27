@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -32,13 +31,6 @@ public final class StartupTimeline {
         EVENTS.add(new TimelineEvent(phase, description, durationMs,
                 Thread.currentThread().getName()));
         log.info("[Startup] {}: {} ({}ms)", phase, description, durationMs);
-    }
-
-    public static void recordEvent(String phase, String description) {
-        long duration = applicationStartTime > 0
-                ? System.nanoTime() - applicationStartTime
-                : 0;
-        recordEvent(phase, description, TimeUnit.NANOSECONDS.toMillis(duration));
     }
 
     public static void recordConfigSource(String sourceName, long durationMs) {
@@ -78,12 +70,10 @@ public final class StartupTimeline {
         sb.append("🚀 Spring Boot启动分析报告\n");
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
-        // 总耗时
         long totalTime = EVENTS.isEmpty() ? 0
                 : EVENTS.get(EVENTS.size() - 1).getDurationMs();
         sb.append(String.format("总耗时: %,dms%n%n", totalTime));
 
-        // 阶段明细
         sb.append("📊 启动阶段明细:\n");
         EVENTS.forEach(e -> {
             String bar = "█".repeat(Math.min(50, (int) e.getDurationMs() / 100));

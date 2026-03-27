@@ -1,6 +1,6 @@
 package io.github.danburen.springlaunchmonitor.listener;
 
-import io.github.danburen.springlaunchmonitor.util.StartupTimeline;
+import io.github.danburen.springlaunchmonitor.util.EventRecorder;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -19,7 +19,7 @@ public class ConfigLoadMonitor implements EnvironmentPostProcessor {
             source.getProperty("spring.application.name");
             long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - sourceStart);
 
-            StartupTimeline.recordConfigSource(source.getName(), duration);
+            EventRecorder.recordConfigSource(source.getName(), duration);
         }
     }
 }

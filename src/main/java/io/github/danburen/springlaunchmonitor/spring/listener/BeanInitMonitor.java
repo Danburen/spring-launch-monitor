@@ -1,6 +1,6 @@
 package io.github.danburen.springlaunchmonitor.listener;
 
-import io.github.danburen.springlaunchmonitor.util.StartupTimeline;
+import io.github.danburen.springlaunchmonitor.util.EventRecorder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -35,13 +35,10 @@ public class BeanInitMonitor implements BeanPostProcessor, PriorityOrdered {
         Long startTime = beanStartTimes.remove(beanName);
         if (startTime != null) {
             long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-            // 只记录耗时较长的Bean（>100ms），避免数据过多
-            if (duration > 10) {
-                StartupTimeline.recordBeanInit(beanName,
-                        bean.getClass().getName(),
-                        duration,
-                        getBeanDependencies(bean));
-            }
+            EventRecorder.recordBeanInit(beanName,
+                    bean.getClass().getName(),
+                    duration,
+                    getBeanDependencies(bean));
         }
         return bean;
     }

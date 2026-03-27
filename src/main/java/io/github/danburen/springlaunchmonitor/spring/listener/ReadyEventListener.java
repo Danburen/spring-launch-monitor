@@ -1,6 +1,6 @@
 package io.github.danburen.springlaunchmonitor.listener;
 
-import io.github.danburen.springlaunchmonitor.util.StartupTimeline;
+import io.github.danburen.springlaunchmonitor.util.EventRecorder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -11,12 +11,12 @@ public class ReadyEventListener implements ApplicationListener<ApplicationReadyE
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         long duration = TimeUnit.NANOSECONDS.toMillis(
-                System.nanoTime() - StartupTimeline.getStartTime());
-        StartupTimeline.recordEvent("ApplicationReady", "应用就绪", duration);
+                System.nanoTime() - EventRecorder.getStartTime());
+        EventRecorder.recordEvent("ApplicationReady", "phase.application.ready", duration);
 
-        String report = StartupTimeline.generateReport();
+        String report = EventRecorder.generateReport();
         System.out.println(report);
-        String heat = StartupTimeline.generateFlameGraphData();
+        String heat = EventRecorder.generateFlameGraphData();
         System.out.println(heat);
     }
 }
