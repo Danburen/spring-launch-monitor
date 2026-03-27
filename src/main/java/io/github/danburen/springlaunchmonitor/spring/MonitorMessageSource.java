@@ -1,19 +1,18 @@
-package io.github.danburen.springlaunchmonitor.component;
+package io.github.danburen.springlaunchmonitor.spring;
 
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.*;
 
-@Component
 public class MonitorMessageSource {
     private final ResourceLoader resourceLoader;
     public static final Map<String, Map<Locale, String>> MESSAGE = new HashMap<>();
@@ -33,18 +32,28 @@ public class MonitorMessageSource {
 
     @PostConstruct
     private void init(){
-        if("auto".equals(localStr)){
+        if(localStr == null || localStr.isBlank() || "auto".equalsIgnoreCase(localStr)){
             locale = Locale.getDefault();
         }else{
-            locale = Locale.forLanguageTag(localStr);
+            locale = Locale.forLanguageTag(localStr.replace('_', '-'));
         }
         loadLocal(locale);
     }
 
-    public String getMessage(String code, String defaultMsg,Locale locale, String args) {
+    public String getMessage(String code, String defaultMsg, Locale locale, Object... args) {
+        Locale effectiveLocale = locale == null ? this.locale : locale;
+        if (effectiveLocale == null) {
+            effectiveLocale = Locale.getDefault();
+        }
+
         String template = MESSAGE.getOrDefault(code, Collections.emptyMap())
-                .getOrDefault(locale, defaultMsg);
-        return String.format(template, args);
+                .getOrDefault(effectiveLocale, defaultMsg);
+        if (template == null || template.isEmpty()) {
+            template = defaultMsg;
+        }
+
+        Object[] safeArgs = args == null ? new Object[0] : args;
+        return MessageFormat.format(template, safeArgs);
     }
 
     public void loadLocal(Locale locale) {
@@ -53,7 +62,8 @@ public class MonitorMessageSource {
             if (props != null) {
                 this.locale = locale;
                 for (String key : props.stringPropertyNames()) {
-                    MESSAGE.put(key, Map.of(locale, props.getProperty(key)));
+                    MESSAGE.computeIfAbsent(key, k -> new HashMap<>())
+                            .put(locale, props.getProperty(key));
                 }
             }
     }

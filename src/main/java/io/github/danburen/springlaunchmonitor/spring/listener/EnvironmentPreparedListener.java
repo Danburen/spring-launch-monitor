@@ -1,4 +1,4 @@
-package io.github.danburen.springlaunchmonitor.listener;
+package io.github.danburen.springlaunchmonitor.spring.listener;
 
 import io.github.danburen.springlaunchmonitor.util.EventRecorder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;

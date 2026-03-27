@@ -1,6 +1,6 @@
 org.springframework.context.ApplicationListener=\
-io.github.danburen.springlaunchmonitor.listener.StartingEventListener,\
-io.github.danburen.springlaunchmonitor.listener.EnvironmentPreparedListener,\
-io.github.danburen.springlaunchmonitor.listener.ContextRefreshedListener,\
-io.github.danburen.springlaunchmonitor.listener.ReadyEventListener
+io.github.danburen.springlaunchmonitor.spring.listener.StartingEventListener,\
+io.github.danburen.springlaunchmonitor.spring.listener.EnvironmentPreparedListener,\
+io.github.danburen.springlaunchmonitor.spring.listener.ContextRefreshedListener,\
+io.github.danburen.springlaunchmonitor.spring.listener.ReadyEventListener
 
