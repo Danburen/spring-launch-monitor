@@ -162,4 +162,4 @@ dependencies {
 
 ## License
 
-See `[LICENSE](https://github.com/Danburen/spring-launch-monitor/blob/main/LICENSE)`.
+See [LICENSE](https://github.com/Danburen/spring-launch-monitor/blob/main/LICENSE).
