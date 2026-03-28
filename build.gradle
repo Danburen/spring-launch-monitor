@@ -7,18 +7,6 @@ plugins {
     id "com.vanniktech.maven.publish" version "0.32.0"
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            versionMapping {
-                allVariants {
-                    fromResolutionResult()
-                }
-            }
-        }
-    }
-}
 
 group = 'io.github.danburen'
 version = '0.0.1'
@@ -36,6 +24,8 @@ bootJar { enabled = false }
 jar { enabled = true }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
 }
 
