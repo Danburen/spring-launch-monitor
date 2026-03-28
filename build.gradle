@@ -4,6 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java-library'
     id 'maven-publish'
+    id "com.vanniktech.maven.publish" version "0.32.0"
 }
 
 publishing {
@@ -20,13 +21,15 @@ publishing {
 }
 
 group = 'io.github.danburen'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 description = 'spring-launch-monitor'
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(22)
     }
+    withJavadocJar()
+    withSourcesJar()
 }
 
 bootJar { enabled = false }
@@ -54,4 +57,41 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+mavenPublishing {
+    publishToMavenCentral("CENTRAL_PORTAL")
+
+    signAllPublications()
+
+    coordinates(group, "spring-launch-monitor", version)
+
+    pom {
+        name = "Spring Launch Monitor"
+        description = "A plug-and-play Spring Boot startup profiler that instantly pinpoints slow startup bottlenecks."
+        inceptionYear = "2026"
+        url = "https://github.com/danburen/spring-launch-monitor"
+
+        licenses {
+            license {
+                name = "MIT License"
+                url = "https://opensource.org/license/MIT"
+                distribution = "repo"
+            }
+        }
+
+        developers {
+            developer {
+                id = "danburen"
+                name = "Cong Huang"
+                email = "huang.cong0210@qq.com"
+            }
+        }
+
+        scm {
+            url = "https://github.com/danburen/spring-launch-monitor"
+            connection = "scm:git:https://github.com/danburen/spring-launch-monitor.git"
+            developerConnection = "scm:git:https://github.com/danburen/spring-launch-monitor.git"
+        }
+    }
 }
