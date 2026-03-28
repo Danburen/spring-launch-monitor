@@ -1,0 +1,59 @@
+{
+  "groups": [
+    {
+      "name": "launch.monitor",
+      "type": "io.github.danburen.springlaunchmonitor.config.LaunchMonitorProperties",
+      "sourceType": "io.github.danburen.springlaunchmonitor.config.LaunchMonitorProperties"
+    },
+    {
+      "name": "launch.monitor.flame",
+      "type": "io.github.danburen.springlaunchmonitor.config.LaunchMonitorProperties$FlameProperties",
+      "sourceType": "io.github.danburen.springlaunchmonitor.config.LaunchMonitorProperties$FlameProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "launch.monitor.enable",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Master switch for startup monitor."
+    },
+    {
+      "name": "launch.monitor.report",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Print plain text startup report to console when application is ready."
+    },
+    {
+      "name": "launch.monitor.locale",
+      "type": "java.lang.String",
+      "defaultValue": "auto",
+      "description": "Locale used by i18n message rendering."
+    },
+    {
+      "name": "launch.monitor.output-dir",
+      "type": "java.lang.String",
+      "defaultValue": "build/reports/spring-launch-monitor",
+      "description": "Directory used to write flame-tree HTML and JSON files."
+    },
+    {
+      "name": "launch.monitor.flame.console",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Print folded flame data to console."
+    },
+    {
+      "name": "launch.monitor.flame.html",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Write HTML flame tree report file."
+    },
+    {
+      "name": "launch.monitor.flame.json",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Write compact JSON flame tree report file."
+    }
+  ]
+}
+
