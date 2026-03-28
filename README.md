@@ -2,7 +2,20 @@
 
 A plug-and-play Spring Boot startup monitor that captures startup phases and bean initialization timing, then outputs a readable startup report plus flame-tree artifacts.
 
-## What It Provides
+## 📷 Screenshot
+
+<details open>
+  <summary>
+     Expend/Collapse Screenshot
+  </summary>
+  Report
+  <img width="1094" height="766" alt="image" src="https://github.com/user-attachments/assets/30dea6b2-50a4-4ea9-8833-7401e23598dd" />
+  Package Flame Tree
+  <img width="1848" height="805" alt="image" src="https://github.com/user-attachments/assets/5cd2145e-8838-40e2-9c01-a57a2644afdd" />
+
+</details>
+
+## 😄What It Provides
 
 - Startup timeline capture (from early boot phases to ready).
 - Bean initialization timing collection.
@@ -11,7 +24,7 @@ A plug-and-play Spring Boot startup monitor that captures startup phases and bea
 - HTML flame tree report for visual diagnosis.
 - Compact JSON tree output for custom dashboards/tools.
 
-## Principle
+## ⚙️ Principle
 
 - Early startup events are captured through Spring Boot lifecycle listeners (for example starting/environment/context/ready phases).
 - Bean initialization timing is collected through `BeanPostProcessor` hooks and aggregated as startup records.
@@ -20,7 +33,7 @@ A plug-and-play Spring Boot startup monitor that captures startup phases and bea
   - Artifacts: HTML (rich i18n report + flame tree) and JSON (compact package tree for tooling).
 - Package-level flame tree is built by aggregating bean class package segments (for example `org -> springframework -> ...`) with cumulative latency.
 
-## How To Use
+## 👉 How To Use
 
 ### 1) Add Dependency
 
@@ -56,7 +69,7 @@ launch:
 
 At `ApplicationReadyEvent`, the monitor will:
 
-- Print console report (when `report=true`).
+- Print console report (when `launch.monitor.flame.console=true`).
 - Print folded flame output (when `flame.console=true`).
 - Write artifacts (depending on `flame.html/json`):
   - `flame-tree.html`
@@ -99,7 +112,7 @@ By default, files are generated under:
 - `flame-tree.json`
   - Compact package tree JSON.
 
-## How To Build
+## 🧱 How To Build
 
 ### Build Library
 
@@ -147,29 +160,6 @@ dependencies {
 ./gradlew.bat --refresh-dependencies build
 ```
 
-## QA
-
-- Keep this section reserved for QA checklists and known test baselines.
-- Temporary placeholder (do not remove for now):
-  - [ ] Startup phase timeline baseline
-  - [ ] Bean slow-top accuracy check
-  - [ ] HTML/JSON artifact generation check
-  - [ ] i18n locale rendering check
-
-## Troubleshooting
-
-### IDE says "Cannot resolve configuration property"
-
-- Ensure you are using the latest built/published jar.
-- Refresh Gradle project in IDE.
-- Invalidate IDE caches if needed.
-- Use canonical kebab-case keys (for example `output-dir`, not `outputDir`).
-
-### YAML loading fails due to `snakeyaml` missing
-
-- Ensure dependency graph still includes YAML parser at runtime.
-- Avoid excluding required transitive dependencies accidentally.
-
 ## License
 
-See `LICENSE`.
+See `[LICENSE](https://github.com/Danburen/spring-launch-monitor/blob/main/LICENSE)`.
