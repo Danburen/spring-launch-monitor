@@ -29,6 +29,11 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Run tests
+        run: ./gradlew test
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
       - name: Build
         run: ./gradlew clean build --no-configuration-cache
 
