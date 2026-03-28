@@ -29,7 +29,13 @@ repositories {
     mavenCentral()
 }
 
+def springBootVersion = '4.0.4'
+
 dependencies {
+    // Publish a real platform reference so Gradle metadata can resolve managed versions.
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
     implementation 'org.springframework.boot:spring-boot-starter'
 
     compileOnly 'org.projectlombok:lombok:1.18.36'
