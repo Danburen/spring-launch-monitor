@@ -1,4 +1,4 @@
-package io.github.danburen.springlaunchmonitor.spring.flame;
+package io.github.danburen.springlaunchmonitor.flame;
 
 import io.github.danburen.springlaunchmonitor.data.LaunchRecordsCtx;
 

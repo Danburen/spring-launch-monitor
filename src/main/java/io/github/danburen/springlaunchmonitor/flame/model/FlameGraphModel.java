@@ -1,4 +1,4 @@
-package io.github.danburen.springlaunchmonitor.spring.flame.model;
+package io.github.danburen.springlaunchmonitor.flame.model;
 
 import io.github.danburen.springlaunchmonitor.data.TimelineEvent;
 

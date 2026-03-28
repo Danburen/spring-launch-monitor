@@ -1,13 +1,16 @@
 package io.github.danburen.springlaunchmonitor.spring.flame;
 
 import io.github.danburen.springlaunchmonitor.data.BeanInitRecord;
-import io.github.danburen.springlaunchmonitor.data.ConfigSourceRecord;
 import io.github.danburen.springlaunchmonitor.data.LaunchRecordsCtx;
 import io.github.danburen.springlaunchmonitor.data.TimelineEvent;
+import io.github.danburen.springlaunchmonitor.flame.FlameGraphDataGenerator;
+import io.github.danburen.springlaunchmonitor.flame.HtmlI18nLabels;
+import io.github.danburen.springlaunchmonitor.flame.PackageTreeFlameGraphDataGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PackageTreeFlameGraphDataGeneratorTests {
@@ -27,14 +30,22 @@ class PackageTreeFlameGraphDataGeneratorTests {
                 new BeanInitRecord("c", "io.github.demo.C", 50, List.of())
         );
 
-        LaunchRecordsCtx ctx = new LaunchRecordsCtx(events, beans, List.<ConfigSourceRecord>of());
+        LaunchRecordsCtx ctx = new LaunchRecordsCtx(events, beans, List.of());
         String output = generator.generate(ctx);
+        String json = generator.generateJsonTree(ctx);
+        String html = generator.generateHtml(ctx, "Sample Startup Report", HtmlI18nLabels.englishDefaults());
 
         assertTrue(output.contains("springboot;ApplicationReady 1500"));
         assertTrue(output.contains("springboot;bean-init;org 300"));
-        assertTrue(output.contains("springboot;bean-init;org;springframework 100"));
         assertTrue(output.contains("- org (total: 300ms"));
-        assertTrue(output.contains("- springframework (total: 100ms"));
+        assertTrue(output.contains("- springframework (total: 300ms"));
+        assertTrue(output.contains("- context (total: 100ms"));
+        assertTrue(json.contains("\"packageTree\""));
+        assertFalse(json.contains("\"timeline\""));
+        assertTrue(json.contains("\"name\":\"springframework\""));
+        assertTrue(html.contains("<!DOCTYPE html>"));
+        assertTrue(html.contains("Spring Launch Monitor Startup Report"));
+        assertTrue(html.contains("Sample Startup Report"));
     }
 }
 

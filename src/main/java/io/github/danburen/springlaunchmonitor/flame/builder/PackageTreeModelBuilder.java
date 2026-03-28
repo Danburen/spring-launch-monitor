@@ -1,9 +1,9 @@
-package io.github.danburen.springlaunchmonitor.spring.flame.builder;
+package io.github.danburen.springlaunchmonitor.flame.builder;
 
 import io.github.danburen.springlaunchmonitor.data.BeanInitRecord;
 import io.github.danburen.springlaunchmonitor.data.LaunchRecordsCtx;
-import io.github.danburen.springlaunchmonitor.spring.flame.model.FlameGraphModel;
-import io.github.danburen.springlaunchmonitor.spring.flame.model.PackageTreeNode;
+import io.github.danburen.springlaunchmonitor.flame.model.FlameGraphModel;
+import io.github.danburen.springlaunchmonitor.flame.model.PackageTreeNode;
 
 public class PackageTreeModelBuilder {
 

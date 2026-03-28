@@ -1,22 +1,26 @@
 spring:
   application:
     name: spring-launch-monitor
-  datasource:
-    url: jdbc:mysql://localhost:3306/mysqldb
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+#  datasource: auto-configured by Spring Boot, you can configure it manually if you want
+#    url: jdbc:mysql://localhost:3306/mysqldb
+#    username: root
+#    password: 123456
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQLDialect
 
 launch:
   monitor:
     enable: true
-    report: true
-    flame: true
-    locale: auto
+    report: true # Whether to generate a report after the application starts, default is true
+    flame:
+      console: false # Whether to print flame graph data to console, default is false.
+      html: true # Whether to generate an HTML flame graph, default is true.
+      json: true # Whether to generate a JSON flame graph, default is true.
+    output-dir: build/reports/spring-launch-monitor # The directory where the report and flame graph will be generated.
+    locale: zh-CN

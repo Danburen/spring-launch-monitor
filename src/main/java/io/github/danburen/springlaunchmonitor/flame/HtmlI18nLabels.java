@@ -1,4 +1,4 @@
-package io.github.danburen.springlaunchmonitor.spring.flame;
+package io.github.danburen.springlaunchmonitor.flame;
 
 public class HtmlI18nLabels {
     private final String lang;

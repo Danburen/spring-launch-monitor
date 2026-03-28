@@ -1,7 +1,7 @@
-package io.github.danburen.springlaunchmonitor.spring.flame;
+package io.github.danburen.springlaunchmonitor.flame;
 
-import io.github.danburen.springlaunchmonitor.spring.flame.model.FlameGraphModel;
-import io.github.danburen.springlaunchmonitor.spring.flame.model.PackageTreeNode;
+import io.github.danburen.springlaunchmonitor.flame.model.FlameGraphModel;
+import io.github.danburen.springlaunchmonitor.flame.model.PackageTreeNode;
 
 import java.text.MessageFormat;
 import java.util.Comparator;

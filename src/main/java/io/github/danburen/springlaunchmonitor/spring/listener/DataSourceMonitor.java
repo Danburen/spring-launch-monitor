@@ -13,6 +13,12 @@ public class DataSourceMonitor implements BeanPostProcessor {
 
     private static boolean isJpaPresent() {
         try {
+            Class.forName("jakarta.persistence.EntityManagerFactory");
+            return true;
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
             Class.forName("javax.persistence.EntityManagerFactory");
             return true;
         } catch (ClassNotFoundException e) {
@@ -39,9 +45,13 @@ public class DataSourceMonitor implements BeanPostProcessor {
     }
 
     private Object createJpaProxy(Object target, String beanName) {
+        Class<?>[] interfaces = target.getClass().getInterfaces();
+        if (interfaces.length == 0) {
+            return target;
+        }
         return Proxy.newProxyInstance(
                 target.getClass().getClassLoader(),
-                target.getClass().getInterfaces(),
+                interfaces,
                 (proxy, method, args) -> {
                     if ("createNativeEntityManagerFactory".equals(method.getName()) ||
                             "afterPropertiesSet".equals(method.getName())) {
