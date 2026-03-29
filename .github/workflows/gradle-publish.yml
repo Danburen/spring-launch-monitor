@@ -38,14 +38,23 @@ jobs:
         run: ./gradlew clean build --no-configuration-cache
         
       - name: Setup GPG key
-        run: |
-          cat > ${{ github.workspace }}/private.key << 'GPG_KEY_EOF'
-          ${{ secrets.GPG_PRIVATE_KEY_ASCII }}
-          GPG_KEY_EOF
+        # run: |
+        #   cat > ${{ github.workspace }}/private.key << 'GPG_KEY_EOF'
+        #   ${{ secrets.GPG_PRIVATE_KEY_ASCII }}
+        #   GPG_KEY_EOF
           
-          echo "Key file created:"
+        #   echo "Key file created:"
+        #   head -1 ${{ github.workspace }}/private.key
+        #   tail -1 ${{ github.workspace }}/private.key
+        env:
+          GPG_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY }}  # Base64 编码的版本
+        run: |
+          # 解码
+          echo "$GPG_KEY_BASE64" | base64 -d > ${{ github.workspace }}/private.key
+          
+          # 验证
+          ls -la ${{ github.workspace }}/private.key
           head -1 ${{ github.workspace }}/private.key
-          tail -1 ${{ github.workspace }}/private.key
 
 
       - name: Publish to Maven Central
