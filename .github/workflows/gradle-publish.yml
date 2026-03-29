@@ -36,11 +36,16 @@ jobs:
 
       - name: Build
         run: ./gradlew clean build --no-configuration-cache
-      - name: Write GPG key
+        
+      - name: Setup GPG key
         run: |
-          cat > private.key << 'EOF'
+          cat > ${{ github.workspace }}/private.key << 'GPG_KEY_EOF'
           ${{ secrets.GPG_PRIVATE_KEY_ASCII }}
-          EOF
+          GPG_KEY_EOF
+          
+          echo "Key file created:"
+          head -1 ${{ github.workspace }}/private.key
+          tail -1 ${{ github.workspace }}/private.key
 
 
       - name: Publish to Maven Central
