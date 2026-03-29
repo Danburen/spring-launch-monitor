@@ -2,6 +2,12 @@
 
 A plug-and-play Spring Boot startup monitor that captures startup phases and bean initialization timing, then outputs a readable startup report plus flame-tree artifacts.
 
+![GitHub Release](https://img.shields.io/github/v/release/Danburen/spring-launch-monitor?label=Latest%20Release)
+![GitHub License](https://img.shields.io/github/license/danburen/spring-launch-monitor?label=License)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/danburen/spring-launch-monitor/total)
+![Maven Central Last Update](https://img.shields.io/maven-central/last-update/io.github.danburen/spring-launch-monitor)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.danburen/spring-launch-monitor)
+
 ## 📷 Screenshot
 
 <details open>
