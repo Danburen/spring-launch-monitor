@@ -41,7 +41,7 @@ A plug-and-play Spring Boot startup monitor that captures startup phases and bea
 
 ## 👉 How To Use
 
-### 1) Add Dependency
+**1) Add Dependency**
 
 Use your published coordinate (default example below). Replace `0.0.1` with the latest release from Maven Central before use:
 ```groovy
@@ -60,7 +60,7 @@ dependencies {
 
 If you publish locally first, see `How To Build` and `Use From Another Local Project`.
 
-### 2) Add Configuration (Optional)
+**2) Add Configuration (Optional)**
 
 ```yaml
 launch:
@@ -75,7 +75,7 @@ launch:
     locale: auto
 ```
 
-### 3) Start Application
+**3) Start Application**
 
 At `ApplicationReadyEvent`, the monitor will:
 
@@ -85,7 +85,7 @@ At `ApplicationReadyEvent`, the monitor will:
   - `flame-tree.html`
   - `flame-tree.json`
 
-## Configuration Reference
+**Configuration Reference**
 
 - `launch.monitor.enable` Master switch; default `true`.
 - `launch.monitor.report` Console startup report switch; default `true`.
@@ -95,7 +95,7 @@ At `ApplicationReadyEvent`, the monitor will:
 - `launch.monitor.output-dir` Output directory for generated artifacts.
 - `launch.monitor.locale` i18n locale for HTML/report labels, e.g. `auto`, `en-US`, `zh-CN`.
 
-### Legacy Compatibility Keys
+**Legacy Compatibility Keys**
 
 Currently still recognized for compatibility:
 
@@ -104,7 +104,7 @@ Currently still recognized for compatibility:
 
 Prefer new keys under `launch.monitor.flame.*`.
 
-## Output Files
+**Output Files**
 
 By default, files are generated under:
 
@@ -115,18 +115,18 @@ By default, files are generated under:
 
 ## 🧱 How To Build
 
-### Build Library
+**Build Library**
 
 ```powershell
 ./gradlew.bat clean build
 ```
 
-### Run Tests
+**Run Tests**
 
 ```powershell
 ./gradlew.bat test
 ```
 
-## License
+## 📑 License
 
 See [LICENSE](https://github.com/Danburen/spring-launch-monitor/blob/main/LICENSE).
