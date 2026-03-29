@@ -37,16 +37,20 @@ A plug-and-play Spring Boot startup monitor that captures startup phases and bea
 
 ### 1) Add Dependency
 
-Use your published coordinate (example placeholder below):
-
+Use your published coordinate (default example below). Replace `0.0.1` with the latest release from Maven Central before use:
 ```groovy
-// SNAPSHOT placeholder (recommended for docs/examples)
-def springLaunchMonitorVersion = '0.0.1-SNAPSHOT'
-
 dependencies {
-    implementation "io.github.danburen:spring-launch-monitor:${springLaunchMonitorVersion}"
+    implementation "io.github.danburen:spring-launch-monitor:0.0.1"
 }
 ```
+> [!IMPORTANT]
+> Building Environment:
+> 
+> Java JDK 22
+>   
+> Groove Gradle: 9.4.0+
+> 
+> SpringBoot 4.0.4 
 
 If you publish locally first, see `How To Build` and `Use From Another Local Project`.
 
@@ -124,40 +128,6 @@ By default, files are generated under:
 
 ```powershell
 ./gradlew.bat test
-```
-
-### Publish To Local Maven
-
-```powershell
-./gradlew.bat publishToMavenLocal
-```
-
-## Use From Another Local Project
-
-1. Ensure your consumer project includes `mavenLocal()`:
-
-```groovy
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-```
-
-2. Add dependency:
-
-```groovy
-// SNAPSHOT placeholder
-def springLaunchMonitorVersion = '0.0.1-SNAPSHOT'
-
-dependencies {
-    implementation "io.github.danburen:spring-launch-monitor:${springLaunchMonitorVersion}"
-}
-```
-
-3. Refresh dependencies:
-
-```powershell
-./gradlew.bat --refresh-dependencies build
 ```
 
 ## License
