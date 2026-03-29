@@ -87,20 +87,13 @@ At `ApplicationReadyEvent`, the monitor will:
 
 ## Configuration Reference
 
-- `launch.monitor.enable`
-  - Master switch; default `true`.
-- `launch.monitor.report`
-  - Console startup report switch; default `true`.
-- `launch.monitor.flame.console`
-  - Console folded flame output; default `false`.
-- `launch.monitor.flame.html`
-  - Write HTML flame tree artifact; default `true`.
-- `launch.monitor.flame.json`
-  - Write JSON flame tree artifact; default `true`.
-- `launch.monitor.output-dir`
-  - Output directory for generated artifacts.
-- `launch.monitor.locale`
-  - i18n locale for HTML/report labels, e.g. `auto`, `en-US`, `zh-CN`.
+- `launch.monitor.enable` Master switch; default `true`.
+- `launch.monitor.report` Console startup report switch; default `true`.
+- `launch.monitor.flame.console` Console folded flame output; default `false`.
+- `launch.monitor.flame.html` Write HTML flame tree artifact; default `true`.
+- `launch.monitor.flame.json` Write JSON flame tree artifact; default `true`.
+- `launch.monitor.output-dir` Output directory for generated artifacts.
+- `launch.monitor.locale` i18n locale for HTML/report labels, e.g. `auto`, `en-US`, `zh-CN`.
 
 ### Legacy Compatibility Keys
 
@@ -117,10 +110,8 @@ By default, files are generated under:
 
 `build/reports/spring-launch-monitor`
 
-- `flame-tree.html`
-  - Rich report + package flame tree visualization.
-- `flame-tree.json`
-  - Compact package tree JSON.
+- `flame-tree.html` Rich report + package flame tree visualization.
+- `flame-tree.json` Compact package tree JSON.
 
 ## 🧱 How To Build
 
