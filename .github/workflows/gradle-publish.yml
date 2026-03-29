@@ -36,32 +36,12 @@ jobs:
 
       - name: Build
         run: ./gradlew clean build --no-configuration-cache
-        
-      - name: Setup GPG key
-        # run: |
-        #   cat > ${{ github.workspace }}/private.key << 'GPG_KEY_EOF'
-        #   ${{ secrets.GPG_PRIVATE_KEY_ASCII }}
-        #   GPG_KEY_EOF
-          
-        #   echo "Key file created:"
-        #   head -1 ${{ github.workspace }}/private.key
-        #   tail -1 ${{ github.workspace }}/private.key
-        env:
-          GPG_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY }}  # Base64 编码的版本
-        run: |
-          # 解码
-          echo "$GPG_KEY_BASE64" | base64 -d > ${{ github.workspace }}/private.key
-          
-          # 验证
-          ls -la ${{ github.workspace }}/private.key
-          head -1 ${{ github.workspace }}/private.key
-
 
       - name: Publish to Maven Central
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ github.workspace }}/private.key
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
