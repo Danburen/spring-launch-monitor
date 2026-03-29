@@ -37,11 +37,50 @@ jobs:
       - name: Build
         run: ./gradlew clean build --no-configuration-cache
 
+      - name: Prepare signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          raw_key='${{ secrets.GPG_PRIVATE_KEY }}'
+          if [ -z "$raw_key" ]; then
+            echo "::error::GPG_PRIVATE_KEY is empty"
+            exit 1
+          fi
+
+          normalized_key="$raw_key"
+
+          # Support one-line secrets where newlines were escaped as \n.
+          if [[ "$normalized_key" == *\\n* ]]; then
+            normalized_key="${normalized_key//\\n/$'\n'}"
+          fi
+
+          # Support secrets stored as base64.
+          if [[ "$normalized_key" != *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+            decoded_key="$(printf '%s' "$raw_key" | base64 --decode 2>/dev/null || true)"
+            if [[ "$decoded_key" == *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+              normalized_key="$decoded_key"
+            fi
+          fi
+
+          if [[ "$normalized_key" != *"BEGIN PGP PRIVATE KEY BLOCK"* ]]; then
+            echo "::error::GPG_PRIVATE_KEY is not an armored private key (or decodable base64 of it)"
+            exit 1
+          fi
+
+          # Fast parse check: fail early if key material is malformed or unsupported.
+          printf '%s\n' "$normalized_key" | gpg --batch --list-packets >/dev/null
+
+          {
+            echo "ORG_GRADLE_PROJECT_signingInMemoryKey<<EOF"
+            printf '%s\n' "$normalized_key"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
       - name: Publish to Maven Central
-        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        run: ./gradlew publishToMavenCentral --no-configuration-cache --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
+          # Let Gradle infer key id from the supplied key to avoid id mismatch.
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
